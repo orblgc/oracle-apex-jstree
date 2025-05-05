@@ -1,0 +1,33 @@
+{
+    "name": "APEX jsTree",
+    "version": "1.0",
+    "description": "APEX-jsTree plugin brings the power of jsTree into Oracle APEX with zero-JSON on the database side and full client-side flexibility. Simply point it at your tables via two SQL queries (initial load and optional lazy-load), provide a small JSON config for checkboxes, drag-&-drop rules, custom context menus, search mapping, and node links, and let the plugin handle rendering, events, and PL/SQL callbacks. Built-in support for create, rename, delete, move operations (with bind variables like :TREE$NODE_ID etc.) makes it a drop-in, open-source solution for hierarchical data in APEX.",
+    "keywords": ["oracle","apex","jstree", "tree", "hierarcy"],
+    "homepage": "https://github.com/orblgc/oracle-apex-jstree",
+    "bugs": {
+        "url": "https://github.com/orblgc/oracle-apex-jstree/issues",
+        "email": "orkunbl@hotmail.com"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Orkun Tunç Bilgiç",
+        "email": "orkunbl@hotmail.com",
+        "donationUrl": "https://buymeacoffee.com/orblg"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/orblgc/oracle-apex-jstree.git"
+    },
+    "oracle": {
+        "versions": ["18c", "19c", "21c", "23c", "23ai"],
+        "apex": {
+            "versions": ["23.2", "24.1", "24.2"],
+            "plugin": {
+                "internalName": "JSTREE_APEX",
+                "type": "region",
+                "demo": "https://apex.oracle.com/pls/apex/r/ordibu/demo/login",
+                "previewImage": "https://raw.githubusercontent.com/orblgc/oracle-apex-jstree/refs/heads/main/jstreepreview.png"
+            }
+        }
+    }
+}
