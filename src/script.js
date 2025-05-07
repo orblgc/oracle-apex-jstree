@@ -49,37 +49,47 @@ function initMyJsTree(
         jsTreeConfig.plugins.push('contextmenu');
         jsTreeConfig.contextmenu = {
             items: function(node) {
-                var tree     = this;
-                var type     = node.original.type;
-                var menuDef  = config.contextMenu[type] || [];
-                var items    = {};
+                var tree    = this;
+                var type    = node.original.type;
+                var menuDef = config.contextMenu[type] || [];
 
-                menuDef.forEach(function(m, idx) {
+                // recursive builder
+                function buildItems(defs) {
+                var out = {};
+                defs.forEach(function(m, idx) {
+                    var key    = m.callback || ('action_' + idx);
                     var fnName = m.callback;
-                    items[fnName || ('action_' + idx)] = {
-                        label: typeof m.label === 'function' ? m.label() : m.label,
-                        icon:  m.icon || false,
-                        separator_before: m.separator_before || false,
-                        separator_after:  m.separator_after || false,
-                        _disabled: m._disabled || false,
-                        title: m.title || '',
-                        shortcut: m.shortcut || undefined,
-                        shortcut_label: m.shortcut_label || undefined,
-                        submenu: m.submenu || undefined,
-                        action: function(obj) {
-                            var nd = m.returnAllSelected===true?tree.get_selected(true):tree.get_node(obj.reference);
-                            if (fnName && typeof window[fnName] === 'function') {
-                                window[fnName](nd);
-                            } else {
-                                console.warn('Callback for', fnName, 'not found');
-                            }
+                    // build the menu‐item itself
+                    out[key] = {
+                    label:           typeof m.label === 'function' ? m.label() : m.label,
+                    icon:            m.icon || false,
+                    separator_before:m.separator_before || false,
+                    separator_after: m.separator_after  || false,
+                    _disabled:       m._disabled        || false,
+                    title:           m.title            || '',
+                    shortcut:        m.shortcut         || undefined,
+                    shortcut_label:  m.shortcut_label   || undefined,
+                    // recursively build submenu if present
+                    submenu:         m.submenu ? buildItems(m.submenu) : undefined,
+                    action: function(obj) {
+                        var nd = m.returnAllSelected === true
+                            ? tree.get_selected(true)
+                            : tree.get_node(obj.reference);
+                        if (fnName && typeof window[fnName] === 'function') {
+                        window[fnName](nd);
+                        } else {
+                        console.warn('Callback for', fnName, 'not found');
                         }
+                    }
                     };
                 });
+                return out;
+                }
 
-                return items;
+                // kick off with the top‐level definition
+                return buildItems(menuDef);
             }
-        };
+            };
 
     }
 
@@ -171,7 +181,7 @@ function initMyJsTree(
 
     // DnD plugin
     var mobile = /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
-    if ( mobile && config.dndAllowMobile || !mobile) {
+    if ( (mobile && config.dndAllowMobile || !mobile) && config.useDnd) {
         jsTreeConfig.plugins.push('dnd');
 
         // Eğer ek dnd kuralları varsa üzerine ekle
