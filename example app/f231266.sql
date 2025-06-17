@@ -33,7 +33,7 @@ prompt APPLICATION 231266 - Demo
 -- Application Export:
 --   Application:     231266
 --   Name:            Demo
---   Date and Time:   21:40 Tuesday June 17, 2025
+--   Date and Time:   21:52 Tuesday June 17, 2025
 --   Exported By:     ORKUNBL@HOTMAIL.COM
 --   Flashback:       0
 --   Export Type:     Application Export
@@ -109,7 +109,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_value_01=>'Demo'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>6
-,p_version_scn=>15633063461087
+,p_version_scn=>15633065010046
 ,p_print_server_type=>'INSTANCE'
 ,p_file_storage=>'DB'
 ,p_is_pwa=>'Y'
@@ -12855,6 +12855,8 @@ wwv_flow_imp_page.create_page_plug(
     '    ]',
     '  }',
     '}')),
+  'drop_error_message', 'Drop Error',
+  'drop_success_message', 'Drop Success',
   'init_sql', wwv_flow_string.join(wwv_flow_t_varchar2(
     'SELECT',
     '  ''F_''||f.id           AS node_id,',
@@ -12884,7 +12886,18 @@ wwv_flow_imp_page.create_page_plug(
     '  apex_page.get_url(p_Page=>2,p_items=>''P2_ID'',p_values=>b.id) as href',
     'FROM my_file b',
     '')),
-  'on_drop_plsql', 'null;',
+  'on_drop_plsql', wwv_flow_string.join(wwv_flow_t_varchar2(
+    'BEGIN',
+    '  IF :TREE$NODE_TYPE = ''file'' THEN',
+    '    UPDATE my_file',
+    '       SET folder_id = :TREE$NEW_PARENT_ID',
+    '     WHERE id = :TREE$NODE_ID;',
+    '  ELSIF :TREE$NODE_TYPE = ''folder'' THEN',
+    '    UPDATE my_folder',
+    '       SET folder_id = :TREE$NEW_PARENT_ID',
+    '     WHERE id = :TREE$NODE_ID;',
+    '  END IF;',
+    'END;')),
   'search_item', 'P3_SEARCH',
   'use_ajax_load', 'N',
   'use_drop_plsql', 'Y')).to_clob
