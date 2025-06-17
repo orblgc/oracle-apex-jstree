@@ -33,14 +33,14 @@ prompt APPLICATION 231266 - Demo
 -- Application Export:
 --   Application:     231266
 --   Name:            Demo
---   Date and Time:   00:00 Thursday May 8, 2025
+--   Date and Time:   21:40 Tuesday June 17, 2025
 --   Exported By:     ORKUNBL@HOTMAIL.COM
 --   Flashback:       0
 --   Export Type:     Application Export
 --     Pages:                      6
 --       Items:                   15
 --       Processes:                7
---       Regions:                 30
+--       Regions:                 31
 --       Buttons:                  5
 --       Dynamic Actions:         29
 --     Shared Components:
@@ -98,6 +98,7 @@ wwv_imp_workspace.create_flow(
 ,p_no_proxy_domains=>nvl(wwv_flow_application_install.get_no_proxy_domains,'')
 ,p_flow_version=>'Release 1.0'
 ,p_flow_status=>'AVAILABLE_W_EDIT_LINK'
+,p_flow_unavailable_text=>'This application is currently unavailable at this time.'
 ,p_exact_substitutions_only=>'Y'
 ,p_browser_cache=>'N'
 ,p_browser_frame=>'D'
@@ -108,7 +109,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_value_01=>'Demo'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>6
-,p_version_scn=>15622891897875
+,p_version_scn=>15633063461087
 ,p_print_server_type=>'INSTANCE'
 ,p_file_storage=>'DB'
 ,p_is_pwa=>'Y'
@@ -1586,7 +1587,7 @@ wwv_flow_imp_shared.create_plugin(
 ,p_report_placeholder_count=>3
 ,p_standard_attributes=>'ROW_SELECTION:REGION_TEMPLATE'
 ,p_substitute_attributes=>true
-,p_version_scn=>44595934820521
+,p_version_scn=>15626249752140
 ,p_subscribe_plugin_settings=>true
 ,p_help_text=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'This kanban board plugin supports faceted search & Oracle''s native pagination feature for Template Components.',
@@ -4830,8 +4831,7 @@ unistr('            -- Ko\015Fullu parametre eklemeleri'),
 ,p_render_function=>'p_render'
 ,p_ajax_function=>'p_ajax'
 ,p_substitute_attributes=>true
-,p_reference_id=>93340570929151647
-,p_version_scn=>44690164710704
+,p_version_scn=>15626249069636
 ,p_subscribe_plugin_settings=>true
 ,p_version_identifier=>'1.0'
 ,p_about_url=>'https://github.com/orblgc/oracle-apex-jstree'
@@ -13204,6 +13204,72 @@ unistr('    A URL to attach to the node\2019s link.  '),
   'output_as', 'HTML')).to_clob
 );
 wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(56476524585133685401)
+,p_plug_name=>'Table Creation & Example Data Script'
+,p_parent_plug_id=>wwv_flow_imp.id(38410123854001314014)
+,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
+,p_plug_template=>4072358936313175081
+,p_plug_display_sequence=>50
+,p_plug_display_point=>'SUB_REGIONS'
+,p_location=>null
+,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'<pre><code class="sql">',
+'',
+'CREATE SEQUENCE MY_FOLDER_ID;',
+'',
+'CREATE TABLE MY_FOLDER ',
+'(	',
+'    ID NUMBER DEFAULT ON NULL WKSP_ORDIBU.MY_FOLDER_ID.NEXTVAL NOT NULL, ',
+'    FOLDER_ID NUMBER, ',
+'    NAME VARCHAR2(500 CHAR) NOT NULL, ',
+'    CONSTRAINT MY_FOLDER_PK PRIMARY KEY (ID),',
+'    CONSTRAINT MY_FOLDER_FK FOREIGN KEY (FOLDER_ID) REFERENCES MY_FOLDER (ID) ',
+');',
+'',
+'CREATE SEQUENCE MY_FILE_ID;',
+'',
+'CREATE TABLE MY_FILE ',
+'(	',
+'    ID NUMBER DEFAULT ON NULL WKSP_ORDIBU.MY_FILE_ID.NEXTVAL NOT NULL, ',
+'    FOLDER_ID NUMBER, ',
+'    FILE_NAME VARCHAR2(500 CHAR) NOT NULL, ',
+'    CONSTRAINT MY_FILE_PK PRIMARY KEY (ID),',
+'    CONSTRAINT MY_FILE_FK FOREIGN KEY (FOLDER_ID) REFERENCES MY_FOLDER (ID) ',
+');',
+'',
+'/',
+'-- EXAMPLE DATA INSERT SCRIPT',
+'DECLARE',
+'  l_folder_id  NUMBER;',
+'BEGIN',
+'  FOR i IN 1..50 LOOP',
+'    -- 1) Create a new folder (top-level)',
+'    INSERT INTO my_folder (folder_id, name)',
+'    VALUES (',
+'      NULL,',
+'      ''Folder '' || TO_CHAR(i)',
+'    )',
+'    RETURNING id INTO l_folder_id;',
+'    ',
+'    -- 2) For each new folder, insert 5 files',
+'    FOR j IN 1..5 LOOP',
+'      INSERT INTO my_file (folder_id, file_name)',
+'      VALUES (',
+'        l_folder_id,',
+'        ''Document_'' || TO_CHAR(i) || ''_'' || TO_CHAR(j) || ''.txt''',
+'      );',
+'    END LOOP;',
+'  END LOOP;',
+'',
+'  COMMIT;',
+'END;',
+'</code></pre>',
+''))
+,p_attributes=>wwv_flow_t_plugin_attributes(wwv_flow_t_varchar2(
+  'expand_shortcuts', 'N',
+  'output_as', 'HTML')).to_clob
+);
+wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(38410124243952314018)
 ,p_plug_name=>'Link'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
@@ -15488,7 +15554,9 @@ end;
 /
 prompt --application/deployment/definition
 begin
-null;
+wwv_flow_imp_shared.create_install(
+ p_id=>wwv_flow_imp.id(47043242787137973085)
+);
 end;
 /
 prompt --application/deployment/checks
